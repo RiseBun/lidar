@@ -94,7 +94,6 @@ rosbag play your_data.bag
 设置 rootDir: "/home/li/data/session_02/"，跑第二个包，保存。
 ```
 
-
 第二步：离线优化 (后端拼接)
 修改 config/multi_session.yaml:
 ```bash
