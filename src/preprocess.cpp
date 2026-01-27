@@ -45,10 +45,10 @@ void Preprocess::set(bool feat_en, int lid_type, double bld, int pfilt_num)
 /**
  * @brief Livox激光雷达点云预处理函数
  *
- * @param msg livox激光雷达点云数据,格式为livox_ros_driver::CustomMsg
+ * @param msg livox激光雷达点云数据,格式为livox_ros_driver2::CustomMsg
  * @param pcl_out 输出处理后的点云数据,格式为pcl::PointCloud<pcl::PointXYZINormal>
  */
-void Preprocess::process(const livox_ros_driver::CustomMsg::ConstPtr &msg, pcl::PointCloud<PointType>::Ptr &pcl_out)
+void Preprocess::process(const livox_ros_driver2::CustomMsg::ConstPtr &msg, pcl::PointCloud<PointType>::Ptr &pcl_out)
 {
   livox_handler(msg);
   *pcl_out = pl_surf; // 储存间隔采样点
@@ -102,7 +102,7 @@ void Preprocess::process(const sensor_msgs::PointCloud2::ConstPtr &msg, pcl::Poi
   *pcl_out = pl_surf;
 }
 
-void Preprocess::livox_handler(const livox_ros_driver::CustomMsg::ConstPtr &msg)
+void Preprocess::livox_handler(const livox_ros_driver2::CustomMsg::ConstPtr &msg)
 {
   // 清除之前的点云缓存
   pl_surf.clear();

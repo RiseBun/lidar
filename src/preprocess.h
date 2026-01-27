@@ -1,5 +1,5 @@
 #include "common_lib.h"
-#include <livox_ros_driver/CustomMsg.h>
+#include <livox_ros_driver2/CustomMsg.h>
 
 using namespace std;
 
@@ -155,7 +155,7 @@ public:
   ~Preprocess(); // 析构函数
 
   // 对Livox自定义Msg格式的激光雷达数据进行处理
-  void process(const livox_ros_driver::CustomMsg::ConstPtr &msg, pcl::PointCloud<PointType>::Ptr &pcl_out);
+  void process(const livox_ros_driver2::CustomMsg::ConstPtr &msg, pcl::PointCloud<PointType>::Ptr &pcl_out);
   // 对ros的Msg格式的激光雷达数据进行处理
   void process(const sensor_msgs::PointCloud2::ConstPtr &msg, pcl::PointCloud<PointType>::Ptr &pcl_out);
   void set(bool feat_en, int lid_type, double bld, int pfilt_num);
@@ -170,7 +170,7 @@ public:
   ros::Publisher pub_full, pub_surf, pub_corn;
 
 private:
-  void livox_handler(const livox_ros_driver::CustomMsg::ConstPtr &msg); // 用于对Livox激光雷达数据进行处理
+  void livox_handler(const livox_ros_driver2::CustomMsg::ConstPtr &msg); // 用于对Livox激光雷达数据进行处理
   void livoxros_handler(const sensor_msgs::PointCloud2::ConstPtr &msg); 
   void velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg); // 用于对velodyne激光雷达数据进行处理
   void oust64_handler(const sensor_msgs::PointCloud2::ConstPtr &msg);

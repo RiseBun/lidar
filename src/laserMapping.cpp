@@ -169,7 +169,7 @@ ros::Publisher pubRecentKeyFrame;
 ros::Publisher pubCloudRegisteredRaw;
 ros::Publisher pubLoopConstraintEdge;
 ros::Publisher pubLidarPCL;
-std::vector<livox_ros_driver::CustomMsgConstPtr> livox_msg;
+std::vector<livox_ros_driver2::CustomMsgConstPtr> livox_msg;
 
 bool aLoopIsClosed = false;
 map<int, int> loopIndexContainer;                               // from new to old
@@ -1224,8 +1224,8 @@ void standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg)
 double timediff_lidar_wrt_imu = 0.0;
 bool timediff_set_flg = false; // 标记是否已经进行了时间同步,false不进行时间同步
 
-// livox_ros_driver::CustomMsg格式点云数据的回调函数,将数据引入buffer中
-void livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg)
+// livox_ros_driver2::CustomMsg格式点云数据的回调函数,将数据引入buffer中
+void livox_pcl_cbk(const livox_ros_driver2::CustomMsg::ConstPtr &msg)
 {
     mtx_buffer.lock(); // 加锁
     double preprocess_start_time = omp_get_wtime();
@@ -1327,7 +1327,7 @@ void imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
 }
 
 // livox custom转pcl
-void LivoxRepubCallback(const livox_ros_driver::CustomMsgConstPtr &livox_msg_in)
+void LivoxRepubCallback(const livox_ros_driver2::CustomMsgConstPtr &livox_msg_in)
 {
     livox_msg.push_back(livox_msg_in); // 读入livox数据
     if (livox_msg.size() < 1)
@@ -2180,7 +2180,7 @@ int main(int argc, char **argv)
     // std::cout << repub_topic << std::endl;
     ros::Subscriber sub_pcl = p_pre->lidar_type == LIVOX ? (p_pre->livox_type == LIVOX_CUS ? nh.subscribe(lid_topic, 200000, livox_pcl_cbk) : nh.subscribe(repub_topic, 200000, livox_ros_cbk)) : nh.subscribe(lid_topic, 200000, standard_pcl_cbk);
     ros::Subscriber sub_imu = nh.subscribe(imu_topic, 200000, imu_cbk);
-    // ros::Subscriber subLivoxMsg = nh.subscribe<livox_ros_driver::CustomMsg>(lid_topic, 100000, LivoxRepubCallback);
+    // ros::Subscriber subLivoxMsg = nh.subscribe<livox_ros_driver2::CustomMsg>(lid_topic, 100000, LivoxRepubCallback);
     
     if (camera_en){
         image_transport::ImageTransport it(nh);

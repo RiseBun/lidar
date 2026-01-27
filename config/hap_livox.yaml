@@ -1,85 +1,85 @@
 common:
-    lid_topic:  "/livox/lidar"
-    imu_topic:  "/livox/imu"
-    camera_topic: "/usb_cam/image_raw"
-    time_sync_en: false         # ONLY turn on when external time synchronization is really not possible
+    lid_topic:  "/livox/lidar"      # [输入] 激光雷达点云的ROS话题名称
+    imu_topic:  "/livox/imu"        # [输入] IMU数据的ROS话题名称
+    camera_topic: "/usb_cam/image_raw" # [输入] 相机图像话题（如果开启相机融合）
+    time_sync_en: false         # [开关] 时间软同步（仅当雷达和IMU没有硬件时间同步时开启，通常Livox自带同步设为false）
 
-    rootDir: "/home/yixin-f/fast-lio2/src/data_lio/"
-    savePCD: true                         # https://github.com/TixiaoShan/LIO-SAM/issues/3
-    savePCDDirectory: "PCDs/"        
-    saveSCD: true 
-    saveSCDDirectory: "SCDs/"
-    saveLOG: true
-    saveLOGDirectory: "LOG/"
-    map_save_en: true  # global map
-    pcd_save_interval: 1                 # how many LiDAR frames saved in each pcd
+    rootDir: "/home/li/data/"   # [路径] ***关键参数*** 数据保存的根目录，生成的PCD/SCD/LOG都会存在这里
+    savePCD: true               # [开关] 是否保存关键帧点云（***后端回环和多阶段建图必须开启***）
+    savePCDDirectory: "PCDs/"   # [路径] 关键帧点云保存的子文件夹名
+    saveSCD: true               # [开关] 是否保存Scan Context描述子（***后端回环必须开启***）
+    saveSCDDirectory: "SCDs/"   # [路径] 描述子保存的子文件夹名
+    saveLOG: true               # [开关] 是否保存运行日志和位姿文件（用于轨迹评估）
+    saveLOGDirectory: "LOG/"    # [路径] 日志保存的子文件夹名
+    map_save_en: true           # [开关] 程序结束时是否保存最终的全局点云地图(Global Map)
+    pcd_save_interval: 1        # [参数] 保存频率：每隔多少帧保存一次PCD（1表示每帧关键帧都保存）
     
 preprocess:
-    lidar_type: 1                # 1 for Livox serials LiDAR, 2 for Velodyne LiDAR
-    livox_type: 1                # 1 for LIVOX_CUS
-    scan_line:  4
-    blind: 0.5
-    feature_enabled: 0  # bool
-    point_filter_num: 3 # bool
-    scan_rate: 10 
-    time_unit: 1
+    lidar_type: 1               # [参数] 雷达类型：1代表Livox系列（Avia/Mid360），2代表Velodyne/Ouster等机械雷达
+    livox_type: 1               # [参数] Livox数据格式：1代表使用自定义消息格式(CustomMsg)，通常配合livox_ros_driver2使用
+    scan_line:  4               # [参数] 扫描线数（对于Livox solid-state雷达，这个参数主要影响特征提取，Mid360通常设为4或6均可）
+    blind: 0.5                  # [参数] 盲区阈值：距离雷达小于0.5米的点将被过滤掉（Mid360近处可能有遮挡）
+    feature_enabled: 0          # [开关] 是否提取特征点（0=False关闭，直接使用全量点云，FAST-LIO2默认通常关闭以提高鲁棒性）
+    point_filter_num: 3         # [参数] 降采样倍率：每隔3个点取1个点（用于减少计算量）
+    scan_rate: 10               # [参数] 雷达扫描频率（Hz），Mid-360通常是10Hz
+    time_unit: 1                # [参数] 时间单位：1通常代表秒(s)或特定的缩放比例，视驱动而定
 
 camera:
-    camera_en: false
+    camera_en: false            # [开关] 是否开启视觉融合（LVI-SAM模式），纯激光建图设为false
     camera_external: [ 0.000000, -1.000000, 0.000000, 0.000000,
                        0.000000, 0.000000, -1.000000, 0.300000,
                        1.000000, 0.000000, 0.000000, 0.000000,
-                       0.000000, 0.000000, 0.000000, 1.000000]        #相机2雷达外参
+                       0.000000, 0.000000, 0.000000, 1.000000]        # [外参] 相机到雷达的变换矩阵 (4x4)
     camera_internal: [516.235840, 0.000000, 641.125888, 0.000000,
                       0.000000, 533.185608, 338.725370, 0.000000,
-                      0.000000, 0.000000, 1.000000, 0.000000]         #相机内参
+                      0.000000, 0.000000, 1.000000, 0.000000]         # [内参] 相机内参矩阵 (3x4 projection matrix)
 
 mapping:
-    acc_cov: 0.1
-    gyr_cov: 0.1
-    b_acc_cov: 0.0001
-    b_gyr_cov: 0.0001
-    fov_degree:    360
-    det_range:     100.0
-    cube_len: 1000  
-    extrinsic_est_en:  true      # true: enable the online estimation of IMU-LiDAR extrinsic
-    mappingSurfLeafSize: 0.2
-    keyframeAddingDistThreshold: 1.0
-    keyframeAddingAngleThreshold: 0.2
-    extrinsic_T: [ 0.05512, 0.02226, -0.0297 ]
+    acc_cov: 0.1                # [参数] IMU加速度计的高斯白噪声协方差
+    gyr_cov: 0.1                # [参数] IMU陀螺仪的高斯白噪声协方差
+    b_acc_cov: 0.0001           # [参数] IMU加速度计偏置(Bias)的随机游走协方差
+    b_gyr_cov: 0.0001           # [参数] IMU陀螺仪偏置(Bias)的随机游走协方差
+    fov_degree:    360          # [参数] 雷达视场角（FOV），Mid-360是全向的，所以设为360
+    det_range:     100.0        # [参数] 雷达有效探测距离（米），超过此距离的点不参与建图
+    cube_len: 1000              # [参数] 局部地图（Local Map）的立方体边长（米），用于ikd-tree维护
+    extrinsic_est_en:  true     # [开关] ***关键参数*** 是否开启在线外参估计（如果外参不准，开启它可以自动校准IMU-LiDAR外参）
+    mappingSurfLeafSize: 0.2    # [参数] 地图面点的降采样体素大小（米），越小越精细但越慢
+    keyframeAddingDistThreshold: 1.0   # [参数] 关键帧选取阈值：距离变化超过1.0米增加一个关键帧
+    keyframeAddingAngleThreshold: 0.2  # [参数] 关键帧选取阈值：角度变化超过0.2弧度增加一个关键帧
+    extrinsic_T: [ 0.05512, 0.02226, -0.0297 ] # [外参] 初始平移外参：雷达中心到IMU中心的位移 (x, y, z)
     extrinsic_R: [ 1, 0, 0,
                    0, 1, 0,
-                   0, 0, 1]
+                   0, 0, 1]     # [外参] 初始旋转外参：雷达坐标系到IMU坐标系的旋转矩阵 (3x3)
 
 ikdtree:
-    max_iteration: 4
-    recontructKdTree: true  # if path is too large, the rviz will crash, but default is false
-    kd_step: 40
-    filter_size_map_min: 0.2
+    max_iteration: 4            # [参数] EKF卡尔曼滤波的最大迭代次数
+    recontructKdTree: true      # [开关] 是否定期重构ikd-tree（设为true可以防止树不平衡导致Rviz崩溃或变慢）
+    kd_step: 40                 # [参数] 重构频率：每隔40帧重构一次ikd-tree
+    filter_size_map_min: 0.2    # [参数] ikd-tree内部存储点的最小体素大小（通常与mappingSurfLeafSize一致）
 
 loop:
-    loopClosureEnableFlag: false
-    loopClosureFrequency: 1.0
-    historyKeyframeSearchRadius: 10.0
-    historyKeyframeSearchTimeDiff: 30.0
-    historyKeyframeSearchNum: 1  # submap
-    historyKeyframeFitnessScore: 0.2
+    loopClosureEnableFlag: true       # [开关] 是否在前端建图时开启回环检测（**离线多阶段优化时通常设为false，在后端步骤再做回环**）
+    loopClosureFrequency: 1.0          # [参数] 回环检测频率（Hz）
+    historyKeyframeSearchRadius: 10.0  # [参数] 回环搜索半径（米）：搜索当前位置10米范围内的历史帧
+    historyKeyframeSearchTimeDiff: 30.0 # [参数] 时间阈值（秒）：只搜索30秒之前的帧（防止把自己识别为回环）
+    historyKeyframeSearchNum: 1        # [参数] 每次搜索候选回环帧的数量
+    historyKeyframeFitnessScore: 0.2   # [参数] ICP匹配得分阈值：得分小于0.2才认为是有效回环（越小越严格）
 
 segment:
-    ground_en: false
-    tollerance_en: false  # // TODO: error !
-    sensor_height: 1.5
-    z_tollerance: 2.0
-    rotation_tollerance: 0.2
+    ground_en: false            # [开关] 是否开启地面分割约束（通常用于地面车辆，手持或无人机设为false）
+    tollerance_en: false        # [开关] 是否开启容差/自由度约束
+    sensor_height: 1.5          # [参数] 传感器离地高度（如果开启ground_en需要设置）
+    z_tollerance: 2.0           # [参数] Z轴高度的容忍范围
+    rotation_tollerance: 0.2    # [参数] 旋转角度的容忍范围
 
 publish:
-    path_en:  true
-    scan_publish_en:  true       # false: close all the point cloud output
-    dense_publish_en: false       # false: low down the points number in a global-frame point clouds scan.
-    scan_bodyframe_pub_en: true  # true: output the point cloud scans in IMU-body-frame
+    path_en:  true              # [开关] 是否发布里程计轨迹 (Path消息)
+    scan_publish_en:  true      # [开关] 是否发布当前帧的点云 (用于Rviz显示)
+    dense_publish_en: false     # [开关] 是否发布稠密点云（False表示降采样后发布，True表示发布原始全量点云，True会很卡）
+    scan_bodyframe_pub_en: true # [开关] true: 发布基于IMU坐标系的点云；false: 发布基于雷达坐标系的点云
 
 visualization:
-    globalMapVisualizationSearchRadius: 10.0  # ikdtree search
-    globalMapVisualizationPoseDensity: 1   # ikdtree pose
-    globalMapVisualizationLeafSize: 0.2  # ikdtree point
-    visulize_IkdtreeMap: true
+    globalMapVisualizationSearchRadius: 10.0 # [参数] Rviz中显示全局地图的范围半径（米），只显示周围10米
+    globalMapVisualizationPoseDensity: 1     # [参数] 全局地图可视化的位姿采样密度（每隔多少帧显示一次）
+    globalMapVisualizationLeafSize: 0.2      # [参数] Rviz显示的全局地图点云降采样大小
+    visulize_IkdtreeMap: true                # [开关] 是否在Rviz中显示ikd-tree维护的局部地图
