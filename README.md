@@ -45,41 +45,42 @@ unzip 4.0.3.zip && cd gtsam-4.0.3/build
 cmake .. -DGTSAM_USE_SYSTEM_EIGEN=ON -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
 make -j4 && sudo make install
 Livox 驱动：推荐安装 livox_ros_driver2。
-🛠️ 编译流程
 ```
 
-
-```bashcd ～/vilota_lidar_ws/src
+编译流程
+```bash
+mkdir -p vilota_lidar_ws/src
+cd ～/vilota_lidar_ws/src
 git clone <本仓库地址>
 cd ..
 git clone <livox_ros_driver2的地址>
-```bash
+```
 # 关键：必须带上 ROS1 参数，否则 livox 驱动会报错
 ```bash
 catkin_make -DROS_EDITION=ROS1
-```bash
+```
 
-▶️ 运行指南
+ 运行指南
 场景一：单次建图 + 在线回环 (最常用)
 目标：跑一个 Bag 包，实时消除漂移，得到完美的地图。
 修改配置 (config/hap_livox.yaml):
 yaml
 
-编辑
 ```bash
 loopClosureEnableFlag: true  # 开启回环
 savePCD: true                # 保存结果
 rootDir: "/home/li/data/result/"  # 设置保存路径
-```bash
+```
+
 启动程序：
-编辑
 ```bash
 source devel/setup.bash
 roslaunch fast_lio_sam mapping_hap_livox.launch
+
 播放数据：
-```bash
+```
 rosbag play your_data.bag
-```bash
+```
 结束：播放完后按 Ctrl+C，等待地图保存完成。
 
 场景二：多阶段联合优化 (Multi-session)
@@ -88,6 +89,7 @@ rosbag play your_data.bag
 修改 config/hap_livox.yaml，关闭在线回环 (loopClosureEnableFlag: false)，开启 savePCD: true。
 设置 rootDir: "/home/li/data/session_01/"，跑第一个包，保存。
 设置 rootDir: "/home/li/data/session_02/"，跑第二个包，保存。
+
 第二步：离线优化 (后端拼接)
 修改 config/multi_session.yaml:
 ```bash
@@ -95,39 +97,42 @@ sessions_dir: "/home/li/data/"      # 数据总目录
 central_sess_name: "session_01"     # 基准地图
 query_sess_name: "session_02"       # 待拼接地图
 save_directory: "merged_result/"    # 结果保存名
-```bash
+```
 
 启动优化：
-```bash
+```
 roslaunch fast_lio_sam multi_session.launch
-```bash
+```
+
 查看结果：结果保存在 merged_result 文件夹中。使用 pcl_viewer 查看 aft_map.pcd。
 场景三：在线重定位
 目标：机器人加载这一张建好的地图，进行导航定位。
 修改配置 (config/online_relocalization.yaml):
-```bash
+```
 priorDir: "/home/li/data/session_01/"  # 指定先验地图路径
-```bash
+```
+
 启动重定位节点：
-```bash
+```
 roslaunch fast_lio_sam online_relocalization.launch
-```bash
+```
+
 启动建图节点 (作为里程计输入)：
 注意：此时建图节点的 savePCD 建议关闭，减少负载。
-```bash
+```
 roslaunch fast_lio_sam mapping_hap_livox.launch
-```bash
+```
 初始化：在 RViz 中使用 2D Pose Estimate 按钮给一个大致初始位置。
 
 结果评估 (Evaluation)
 运行多阶段优化或回环后，系统会生成轨迹文件 (LOG/pos_log.txt)。推荐使用 EVO 工具对比优化前后的轨迹效果。
 安装 EVO
-```bash
+```
 pip install evo --upgrade --no-binary evo
-```bash
+```
 
 对比轨迹
-```bash
+```
 ～/.local/bin/evo_traj tum <(awk '{print  $ 1, $ 2, $ 3, $ 4, $ 5, $ 6, $ 7, $ 8}' LOG/pos_log.txt) --ref=ground_truth.txt -p --plot_mode=xyz
-```bash
+```
 (注：请根据实际文件路径调整命令)
