@@ -55,6 +55,8 @@ git clone <本仓库地址>
 cd ..
 git clone <livox_ros_driver2的地址>
 ```
+
+
 # 关键：必须带上 ROS1 参数，否则 livox 驱动会报错
 ```bash
 catkin_make -DROS_EDITION=ROS1
