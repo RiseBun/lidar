@@ -78,6 +78,7 @@ rootDir: "/home/li/data/result/"  # 设置保存路径
 ```bash
 source devel/setup.bash
 roslaunch fast_lio_sam mapping_hap_livox.launch
+```
 
 播放数据：
 ```
