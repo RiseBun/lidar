@@ -57,12 +57,12 @@ git clone <livox_ros_driver2的地址>
 ```
 
 
-# 关键：必须带上 ROS1 参数，否则 livox 驱动会报错
+关键：必须带上 ROS1 参数，否则 livox 驱动会报错
 ```bash
 catkin_make -DROS_EDITION=ROS1
 ```
 
- 运行指南
+# 运行指南
 场景一：单次建图 + 在线回环 (最常用)
 目标：跑一个 Bag 包，实时消除漂移，得到完美的地图。
 修改配置 (config/hap_livox.yaml):
