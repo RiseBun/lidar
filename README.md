@@ -1,4 +1,5 @@
 # 增强版激光雷达惯性里程计与建图系统
+此项目参考fastlio2，scantext,gstm
 
 这是一个基于 FAST-LIO2 的深度增强版本，专为 Livox 系列激光雷达（如 Mid-360, Avia）设计与优化。
 
@@ -44,15 +45,16 @@ wget https://github.com/borglab/gtsam/archive/refs/tags/4.0.3.zip
 unzip 4.0.3.zip && cd gtsam-4.0.3/build
 cmake .. -DGTSAM_USE_SYSTEM_EIGEN=ON -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
 make -j4 && sudo make install
-Livox 驱动：推荐安装 livox_ros_driver2。
 ```
+
+Livox 驱动：安装 sdk2和livox_ros_driver2。
+先安装编译好sdk2，然后将livox_ros_driver2下载到src里，和本项目代码同级。
 
 编译流程
 ```bash
 mkdir -p vilota_lidar_ws/src
 cd ～/vilota_lidar_ws/src
 git clone <本仓库地址>
-cd ..
 git clone <livox_ros_driver2的地址>
 ```
 
