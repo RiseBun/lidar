@@ -46,9 +46,9 @@ cmake .. -DGTSAM_USE_SYSTEM_EIGEN=ON -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
 make -j4 && sudo make install
 Livox 驱动：推荐安装 livox_ros_driver2。
 🛠️ 编译流程
-```bash
+bash
 
-编辑
+
 ```bashcd ～/vilota_lidar_ws/src
 git clone <本仓库地址>
 cd ..
