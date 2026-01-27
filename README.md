@@ -88,9 +88,12 @@ rosbag play your_data.bag
 场景二：多阶段联合优化 (Multi-session)
 目标：把两段不同时间录制的 Bag (Session 01, Session 02) 拼在一起。
 第一步：准备数据 (前端录制)
+```
 修改 config/hap_livox.yaml，关闭在线回环 (loopClosureEnableFlag: false)，开启 savePCD: true。
 设置 rootDir: "/home/li/data/session_01/"，跑第一个包，保存。
 设置 rootDir: "/home/li/data/session_02/"，跑第二个包，保存。
+```
+
 
 第二步：离线优化 (后端拼接)
 修改 config/multi_session.yaml:
