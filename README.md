@@ -72,7 +72,7 @@ sudo make install
 cd ~
 mkdir -p vilota_lidar_ws/src
 cd ~/vilota_lidar_ws/src
-git clone https://github.com/Livox-SDK/Livox-SDK2.git
+git clone https://github.com/RiseBun/lidar.git
 ```
 
 ```bash
