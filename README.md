@@ -1,6 +1,6 @@
 # 增强版激光雷达惯性里程计与建图系统
 
-此项目参考 fastlio2，scantext, gstm
+此项目参考 fastlio2，scantext, gstam
 
 这是一个基于 FAST-LIO2 的深度增强版本，专为 Livox 系列激光雷达（如 Mid-360, Avia）设计与优化。
 
